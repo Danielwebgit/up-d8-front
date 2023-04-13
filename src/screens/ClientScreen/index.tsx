@@ -15,10 +15,11 @@ import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
-import { fetchClients, actionDeleteClient } from '../../redux/store/fetchActions';
+import { fetchClients, actionDeleteClient, searchCustomer } from '../../redux/store/fetchActions';
 import { useDispatch, useSelector } from 'react-redux';
 import store, { RootState } from '../../redux/store';
 import { Link } from 'react-router-dom';
+import apiService from '../../Services/apiService';
 
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
@@ -78,12 +79,44 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const ClientScreen = () => {
 
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
   const dispatch = useDispatch();
   const { clients }: any = useSelector((state: RootState): any => state.clients) ?? [];
   console.log(clients)
   useEffect(() => {
+
     dispatch(fetchClients());
+
+    fetchStates();
   }, [])
+
+  async function fetchStates() {
+    const fetchStates = await apiService.fetchStates();
+    setStates(fetchStates.data);
+  }
+
+  const [formValues, setFormValues] = useState({
+    state_id: '',
+    city_id: '',
+    name: '',
+    cpf: '',
+    date_of_birth: '',
+    gender: ''
+  });
+
+  const handleChange = (event: any) => {
+
+    setFormValues({
+      ...formValues,
+      [event.target.name]: event.target.value,
+      [event.target.cpf]: event.target.value,
+      [event.target.state_id]: event.target.value,
+      [event.target.city_id]: event.target.value,
+      [event.target.date_of_birth]: event.target.value,
+      [event.target.gender]: event.target.value,
+    });
+  };
 
   const handleClientDelete = (clientId: any) => {
     store.dispatch(actionDeleteClient(clientId));
@@ -104,70 +137,91 @@ const ClientScreen = () => {
     localStorage.setItem("clientData", JSON.stringify(clientNew))
   }
 
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const formData = { name: formValues.name, cpf: formValues.cpf, date_of_birth: formValues.date_of_birth, gender: formValues.gender, city_id: formValues.city_id, state_id: formValues.state_id };
+
+    store.dispatch(searchCustomer(formData));
+
+  }
+
   return (
     <Grid container spacing={0} style={{ borderRadius: 70, marginTop: 20 }}>
       <Grid item xs={12} sm={12} md={12} lg={12}>
         <Card style={{ padding: 40 }}>
           <img style={{ width: 120, height: 100 }} src="https://c.na207.content.force.com/servlet/servlet.ImageServer?id=0150L00000APKa2QAH&oid=00DE0000000c48tMAA" alt="" />
           <div style={{ padding: 20, border: "1px solid #1e1e1f", borderRadius: 15 }}>
+          <form onSubmit={handleSubmit}>
             <label htmlFor="" style={{ fontWeight: "bold", fontSize: 22, color: "#764bb5" }}>Consulta cliente</label>
             <FormControl style={{ flexDirection: "row" }}>
-              <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
-                CPF: <TextField type="number" InputProps={{ style: { borderRadius: '20px', width: 150 } }} hiddenLabel size="small" variant="outlined" style={{ background: '#fff' }} name="name_client" />
-              </FormGroup>
+                <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  CPF: <TextField type="text" InputProps={{ style: { borderRadius: '20px', width: 150 } }} hiddenLabel size="small" variant="outlined" style={{ background: '#fff' }} value={formValues.cpf} onChange={handleChange} name="cpf" />
+                </FormGroup>
 
-              <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
-                Nome: <TextField InputProps={{ style: { borderRadius: '70px', width: 180 } }} hiddenLabel size="small" variant="outlined" style={{ background: '#fff', borderWidth: "1" }} name="delivery_address" />
-              </FormGroup>
+                <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  Nome: <TextField InputProps={{ style: { borderRadius: '70px', width: 220, background: '#fff', borderWidth: "1" } }} hiddenLabel size="small" variant="outlined" value={formValues.name} onChange={handleChange} name="name" />
+                </FormGroup>
 
-              <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
-                Data de Nascimento: <input style={{ width: 140, borderRadius: 15, height: '36px' }} type="date" />
-              </FormGroup>
+                <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  Data de Nascimento: <input style={{ width: 140, borderRadius: 15, height: '36px' }} type="date" value={formValues.date_of_birth} onChange={handleChange} name="date_of_birth" />
+                </FormGroup>
 
-              <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
-                <FormControl style={{ margin: 12, display: "flex" }}>
-                  <RadioGroup style={{ display: "flex", flexDirection: "row", justifyContent: "center", height: 40, alignItems: "center" }} name="activated" sx={{ my: 1 }}>
-                    <div style={{ display: "flex" }}>
-                      <label htmlFor="" style={{ marginLeft: 20 }}>Sexo</label>
-                      <Radio style={{ marginLeft: 20 }} value={'1'} label="Masculino" />
-                      <Radio style={{ marginLeft: 20 }} value={'0'} label="Feminino" />
-                    </div>
-                  </RadioGroup>
-                </FormControl>
-              </FormGroup>
-            </FormControl>
+                <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  <FormControl style={{ margin: 12, display: "flex" }}>
+                    <RadioGroup style={{ display: "flex", flexDirection: "row", justifyContent: "center", height: 40, alignItems: "center" }} value={formValues.gender} onChange={handleChange} name="gender" sx={{ my: 1 }}>
+                      <div style={{ display: "flex" }}>
+                        <label htmlFor="" style={{ marginLeft: 20 }}>Sexo</label>
+                        <Radio style={{ marginLeft: 20 }} value={'male'} label="Masculino" />
+                        <Radio style={{ marginLeft: 20 }} value={'female'} label="Feminino" />
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                </FormGroup>
+              </FormControl>
 
             <FormControl style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
-                <InputLabel id="demo-select-small">Estado:</InputLabel>
-                <Select
-                  labelId="demo-customized-select-label"
-                  id="demo-select-small"
-                  name="state_id"
-                  value="valor"
-                  input={<BootstrapInput />}
-                >
-                  <MenuItem value="valor">Tocantins</MenuItem>
-                  <MenuItem value="valor">Goiás</MenuItem>
-                  <MenuItem value="valor">Brasília</MenuItem>
-                </Select>
-              </FormGroup>
+            <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  <InputLabel id="demo-select-small">Estado:</InputLabel>
+                  <Select
+                    labelId="demo-customized-select-label"
+                    id="demo-select-small"
+                    name="state_id"
+                    value={formValues.state_id}
+                    onChange={e => {
 
-              <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
-                <InputLabel id="demo-select-small">Cidade:</InputLabel>
-                <Select
-                  labelId="demo-customized-select-label"
-                  id="demo-select-small"
-                  name="state_id"
-                  value="valor"
-                  size="medium"
-                  input={<BootstrapInput />}
-                >
-                  <MenuItem value="valor">Tocantins</MenuItem>
-                  <MenuItem value="valor">Goiás</MenuItem>
-                  <MenuItem value="valor">Brasília</MenuItem>
-                </Select>
-              </FormGroup>
+                      setFormValues({ ...formValues, state_id: e.target.value })
+
+                      apiService.fetchCities(e.target.value).then((response) => {
+                        setCities(response.data)
+                      })
+                    }}
+                    input={<BootstrapInput />}
+                  >
+                    {states.map((item: any) => (
+                      <MenuItem value={item.id}>{item.title}</MenuItem>
+                    )
+                    )}
+                  </Select>
+                </FormGroup>
+
+                <FormGroup style={{ margin: 12, display: "flex", flexDirection: "row", alignItems: "center" }}>
+                  <InputLabel id="demo-select-small">Cidade:</InputLabel>
+                  <Select
+                    labelId="demo-customized-select-label"
+                    id="demo-select-small"
+                    name="city_id"
+                    value={formValues.city_id}
+                    onChange={handleChange}
+                    size="medium"
+                    input={<BootstrapInput />}
+                  >
+                    {cities.map((item: any) => (
+                      <MenuItem value={item.id}>{item.title}</MenuItem>
+                    )
+                    )}
+                  </Select>
+                </FormGroup>
             </FormControl>
 
             <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -183,6 +237,7 @@ const ClientScreen = () => {
                 </FormGroup>
               </FormControl>
             </Grid>
+            </form>
           </div>
         </Card>
       </Grid>
