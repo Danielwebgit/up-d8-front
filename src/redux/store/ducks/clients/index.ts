@@ -1,11 +1,10 @@
-import { render } from '@testing-library/react';
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   clients: []
 };
 
-const clientsSlice = createSlice({
+const clientsSlice: any = createSlice({
   name: 'clients',
   initialState,
   reducers: {
