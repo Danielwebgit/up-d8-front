@@ -15,11 +15,12 @@ import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
-import { fetchClients, actionDeleteClient, searchCustomer } from '../../redux/store/fetchActions';
+import { fetchClients, actionDeleteClient, searchCustomer, actionPagination } from '../../redux/store/fetchActions';
 import { useDispatch, useSelector } from 'react-redux';
 import store, { RootState } from '../../redux/store';
 import { Link } from 'react-router-dom';
 import apiService from '../../Services/apiService';
+import { TableFooter } from './styles'
 
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
@@ -83,7 +84,22 @@ const ClientScreen = () => {
   const [cities, setCities] = useState([]);
   const dispatch = useDispatch();
   const { clients }: any = useSelector((state: RootState): any => state.clients) ?? [];
-  console.log(clients)
+  const replaceWordNext = "Next &raquo;";
+  const replaceWordPrevious = "&laquo; Previous";
+  
+  const pagination = clients.links?.map((link: any) => {
+
+    if (link.label === replaceWordNext) {
+      return {'url' : link.url,...link, 'label' : "Pŕoximo"};
+    }
+    if(link.label === replaceWordPrevious) {
+      return {'url' : link.url,...link, 'label' : <div style={{marginRight: 20}} dangerouslySetInnerHTML={{ __html: "Anterior" }}></div>};
+    }
+    return link;
+  });
+
+  console.log(pagination)
+
   useEffect(() => {
 
     dispatch(fetchClients());
@@ -135,6 +151,11 @@ const ClientScreen = () => {
     }
 
     localStorage.setItem("clientData", JSON.stringify(clientNew))
+  }
+
+  const handleLinkPagination = (linkPagination: any) => {
+    console.log(linkPagination)
+    store.dispatch(actionPagination(linkPagination))
   }
 
   const handleSubmit = async (e: any) => {
@@ -284,6 +305,17 @@ const ClientScreen = () => {
                 </Table>
               </TableContainer>
             </FormControl>
+            <TableFooter className="table-footer">
+                  { pagination?.map((links: any) => {
+                    return (
+                      <div className={`group-link-pagination`}>
+                        <button onClick={() => handleLinkPagination(links?.url)} 
+                        className={`btn-pagination ${links.active == true ? 'activated' : ''}`}>{links?.label}</button>
+                      </div>
+                    )
+                  })
+                    }
+                  </TableFooter>
           </div>
         </Card>
       </Grid>
