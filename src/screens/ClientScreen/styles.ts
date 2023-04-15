@@ -25,4 +25,9 @@ export const TableFooter = styled.div`
     button.btn-pagination.activated {
     background-color: #9cd7e0;
     }
+
+    button.btn-pagination.desabled-btn {
+      pointer-events: none;
+      opacity: 0.5;
+    }
 `;
