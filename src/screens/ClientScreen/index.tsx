@@ -78,12 +78,18 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+interface UrlSearch {
+  paramsUrl : string
+}
+
 const ClientScreen = () => {
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const dispatch = useDispatch();
   const { clients }: any = useSelector((state: RootState): any => state.clients) ?? [];
+  const { paramsUrl }: any = useSelector((state: UrlSearch): any => state.paramsUrl) ?? [];
+  
   const replaceWordNext = "Next &raquo;";
   const replaceWordPrevious = "&laquo; Previous";
   
@@ -154,8 +160,7 @@ const ClientScreen = () => {
   }
 
   const handleLinkPagination = (linkPagination: any) => {
-    console.log(linkPagination)
-    store.dispatch(actionPagination(linkPagination))
+    store.dispatch(actionPagination(linkPagination, paramsUrl))
   }
 
   const handleSubmit = async (e: any) => {
@@ -309,8 +314,8 @@ const ClientScreen = () => {
                   { pagination?.map((links: any) => {
                     return (
                       <div className={`group-link-pagination`}>
-                        <button onClick={() => handleLinkPagination(links?.url)} 
-                        className={`btn-pagination ${links.active == true ? 'activated' : ''}`}>{links?.label}</button>
+                        <button onClick={() => handleLinkPagination(links?.url)}
+                        className={`btn-pagination ${links?.url == null ? 'desabled-btn' : ''} ${links?.active == true ? 'activated' : ''}`}>{links?.label}</button>
                       </div>
                     )
                   })
