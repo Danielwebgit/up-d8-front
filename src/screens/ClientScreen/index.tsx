@@ -171,7 +171,6 @@ const ClientScreen = () => {
   }
 
   const handleLinkPagination = (linkPagination: any) => {
-    console.log(linkPagination)
     store.dispatch(actionPagination(linkPagination, paramsUrl))
   }
 
