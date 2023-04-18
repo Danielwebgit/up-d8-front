@@ -20,7 +20,7 @@ export default function Header(this: any) {
                   </li>
 
                   <li>
-                    <NavLink to="/clientes/listar" className="nav-link">
+                    <NavLink to="/" className="nav-link">
                       Lista de clientes
                     </NavLink>
                   </li>

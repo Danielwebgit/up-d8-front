@@ -15,11 +15,12 @@ import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
-import { fetchClients, actionDeleteClient, searchCustomer } from '../../redux/store/fetchActions';
+import { fetchClients, actionDeleteClient, searchCustomer, actionPagination } from '../../redux/store/fetchActions';
 import { useDispatch, useSelector } from 'react-redux';
 import store, { RootState } from '../../redux/store';
 import { Link } from 'react-router-dom';
 import apiService from '../../Services/apiService';
+import { TableFooter } from './styles'
 
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
@@ -77,13 +78,34 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+interface UrlSearch {
+  paramsUrl : string
+}
+
 const ClientScreen = () => {
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const dispatch = useDispatch();
   const { clients }: any = useSelector((state: RootState): any => state.clients) ?? [];
-  console.log(clients)
+  const { paramsUrl }: any = useSelector((state: UrlSearch): any => state.paramsUrl) ?? [];
+  
+  const replaceWordNext = "Next &raquo;";
+  const replaceWordPrevious = "&laquo; Previous";
+  
+  const pagination = clients.links?.map((link: any) => {
+
+    if (link.label === replaceWordNext) {
+      return {'url' : link.url,...link, 'label' : "Pŕoximo"};
+    }
+    if(link.label === replaceWordPrevious) {
+      return {'url' : link.url,...link, 'label' : <div style={{marginRight: 20}} dangerouslySetInnerHTML={{ __html: "Anterior" }}></div>};
+    }
+    return link;
+  });
+
+  console.log(pagination)
+
   useEffect(() => {
 
     dispatch(fetchClients());
@@ -104,6 +126,17 @@ const ClientScreen = () => {
     date_of_birth: '',
     gender: ''
   });
+
+  const clearForm = (event: any) => {
+    setFormValues({
+      state_id: '',
+      city_id: '',
+      name: '',
+      cpf: '',
+      date_of_birth: '',
+      gender: ''
+    })
+  }
 
   const handleChange = (event: any) => {
 
@@ -137,11 +170,16 @@ const ClientScreen = () => {
     localStorage.setItem("clientData", JSON.stringify(clientNew))
   }
 
+  const handleLinkPagination = (linkPagination: any) => {
+    console.log(linkPagination)
+    store.dispatch(actionPagination(linkPagination, paramsUrl))
+  }
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     const formData = { name: formValues.name, cpf: formValues.cpf, date_of_birth: formValues.date_of_birth, gender: formValues.gender, city_id: formValues.city_id, state_id: formValues.state_id };
-
+    console.log('ve')
     store.dispatch(searchCustomer(formData));
 
   }
@@ -231,7 +269,7 @@ const ClientScreen = () => {
                     Pesquisar
                   </Button>
 
-                  <Button style={{ marginLeft: 10, height: 40, width: 100 }} type="submit" variant="contained" color="primary">
+                  <Button onClick={clearForm} style={{ marginLeft: 10, height: 40, width: 100 }} type="submit" variant="contained" color="primary">
                     Limpar
                   </Button>
                 </FormGroup>
@@ -284,6 +322,17 @@ const ClientScreen = () => {
                 </Table>
               </TableContainer>
             </FormControl>
+            <TableFooter className="table-footer">
+                  { pagination?.map((links: any) => {
+                    return (
+                      <div className={`group-link-pagination`}>
+                        <button onClick={() => handleLinkPagination(links?.url)}
+                        className={`btn-pagination ${links?.url == null ? 'desabled-btn' : ''} ${links?.active == true ? 'activated' : ''}`}>{links?.label}</button>
+                      </div>
+                    )
+                  })
+                    }
+                  </TableFooter>
           </div>
         </Card>
       </Grid>

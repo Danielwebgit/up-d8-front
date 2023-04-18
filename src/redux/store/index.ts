@@ -1,10 +1,12 @@
 import { useDispatch, TypedUseSelectorHook, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import clientsReduce from './ducks/clients';
+import paramsUrlReduce from './ducks/paramsUrl';
 
 const store = configureStore({
   reducer: {
-      clients: clientsReduce
+      clients: clientsReduce,
+      paramsUrl: paramsUrlReduce
   }
 });
 
