@@ -127,6 +127,17 @@ const ClientScreen = () => {
     gender: ''
   });
 
+  const clearForm = (event: any) => {
+    setFormValues({
+      state_id: '',
+      city_id: '',
+      name: '',
+      cpf: '',
+      date_of_birth: '',
+      gender: ''
+    })
+  }
+
   const handleChange = (event: any) => {
 
     setFormValues({
@@ -167,7 +178,7 @@ const ClientScreen = () => {
     e.preventDefault();
 
     const formData = { name: formValues.name, cpf: formValues.cpf, date_of_birth: formValues.date_of_birth, gender: formValues.gender, city_id: formValues.city_id, state_id: formValues.state_id };
-
+    console.log('ve')
     store.dispatch(searchCustomer(formData));
 
   }
@@ -257,7 +268,7 @@ const ClientScreen = () => {
                     Pesquisar
                   </Button>
 
-                  <Button style={{ marginLeft: 10, height: 40, width: 100 }} type="submit" variant="contained" color="primary">
+                  <Button onClick={clearForm} style={{ marginLeft: 10, height: 40, width: 100 }} type="submit" variant="contained" color="primary">
                     Limpar
                   </Button>
                 </FormGroup>
