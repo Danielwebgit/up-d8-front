@@ -71,11 +71,11 @@ export const searchCustomer = (formData: any): any => {
         newUrl[index] = {'url' : links.url+`&cpf=${formData.cpf}&name=${formData.name}&date_of_birth=${formData.date_of_birth}&gender=${formData.gender}&state_id=${formData.state_id}&city_id=${formData.city_id}`, label: links.label, active: links.active};
         
           if(index == 0){
-            newUrl[index] = {'url' :  links?.url != null ? links?.url +`&cpf=${formData.cpf}&name=${formData.name}&date_of_birth=${formData.date_of_birth}&gender=${formData.gender}&state_id=${formData.state_id}&city_id=${formData.city_id}` : null, 'label' : response.data.clients.links[0]?.label, active: response.data.clients.links[0]?.active};
+            newUrl[index] = {'url' :  links?.url != null ? links?.url +`&cpf=${formData.cpf}&name=${formData.name}&date_of_birth=${formData.date_of_birth}&gender=${formData.gender}&state_id=${formData.state_id}&city_id=${formData.city_id}` : null, 'label' : response.data.clients.links[index]?.label, active: response.data.clients.links[index]?.active};
           }
           if(index == response.data.clients.links.length - 1){
-            const ind = response.data.clients.links.length - 1;
-            newUrl[index] = {'url' : links?.url != null ? links?.url +`&cpf=${formData.cpf}&name=${formData.name}&date_of_birth=${formData.date_of_birth}&gender=${formData.gender}&state_id=${formData.state_id}&city_id=${formData.city_id}` : null, label : response.data.clients.links[ind]?.label, active: response.data.clients.links[ind]?.active};
+            //const ind = response.data.clients.links.length - 1;
+            newUrl[index] = {'url' : links?.url != null ? links?.url +`&cpf=${formData.cpf}&name=${formData.name}&date_of_birth=${formData.date_of_birth}&gender=${formData.gender}&state_id=${formData.state_id}&city_id=${formData.city_id}` : null, label : response.data.clients.links[response.data.clients.links.length - 1]?.label, active: response.data.clients.links[response.data.clients.links.length - 1]?.active};
           }
         });
 
